@@ -8,7 +8,7 @@ st.write("Apne phone se video generate karein:")
 
 prompt = st.text_area(
     "Prompt likhein:",
-    placeholder="E.g., A cute robot dancing on the moon, cinematic 4k...",
+    placeholder="E.g., A majestic lion walking on a neon city street...",
 )
 
 if st.button("Generate Video"):
@@ -17,11 +17,11 @@ if st.button("Generate Video"):
         "Video ban raha hai... isme 1 se 2 minute lag sakte hain..."
     ):
       try:
-        # Working Free Video AI space
-        client = Client("KingNish/ZeroGPU-Wan2.1-1.3B")
+        # Publicly accessible Free Video AI space
+        client = Client("fffiloni/zeroscope")
         result = client.predict(
-            prompt=prompt,
-            api_name="/generate_video",
+            prompt,  # User Prompt
+            api_name="/zrscp",
         )
         st.success("Video ready hai!")
         st.video(result)
@@ -29,3 +29,4 @@ if st.button("Generate Video"):
         st.error(f"Error aaya: {e}")
   else:
     st.warning("Pehle prompt to likhein!")
+      
