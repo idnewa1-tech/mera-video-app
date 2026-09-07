@@ -1,31 +1,28 @@
 import streamlit as st
-import requests
-import urllib.parse
+from gradio_client import Client
 
 st.set_page_config(page_title="Mera AI Video App", layout="centered")
 
 st.title("🎬 Mera AI Video Generator")
-st.write("Apne phone se video generate karein:")
+st.write("Prompt se asli MP4 video banayein:")
 
-prompt = st.text_input("Prompt likhein:", placeholder="E.g., A futuristic sports car racing on a highway...")
+prompt = st.text_input("Prompt likhein:", placeholder="E.g., A red sports car speeding on a highway at night...")
 
 if st.button("Generate Video"):
     if prompt:
-        with st.spinner("AI Video ban raha hai... kripya 30-40 second intezar karein..."):
+        with st.spinner("AI video generate kar raha hai (isme 1-2 minute ka GPU time lag sakta hai)..."):
             try:
-                # Video generate and download in memory
-                clean_prompt = urllib.parse.quote(prompt)
-                url = f"https://image.pollinations.ai/prompt/{clean_prompt}?model=flux&width=480&height=480&nologo=true"
+                # Active video model
+                client = Client("multimodalart/cosmo-video-generator")
+                video_path = client.predict(
+                    prompt,
+                    api_name="/generate_video"
+                )
                 
-                # Check response
-                res = requests.get(url, timeout=60)
-                if res.status_code == 200:
-                    st.success("Animation / Visual ready hai!")
-                    st.image(res.content, caption=prompt, use_container_width=True)
-                else:
-                    st.error("Server busy hai, kripya dobara try karein.")
+                st.success("Video ban gaya!")
+                st.video(video_path)
             except Exception as e:
-                st.error(f"Error aaya: {e}")
+                st.error(f"Error: {e}")
     else:
         st.warning("Pehle prompt likhein!")
         
