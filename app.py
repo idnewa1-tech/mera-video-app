@@ -17,10 +17,10 @@ if st.button("Generate Video"):
         "Video ban raha hai... isme 1 se 2 minute lag sakte hain..."
     ):
       try:
-        client = Client("Lightricks/ltx-video-distilled")
+        # Working Free Video AI space
+        client = Client("KingNish/ZeroGPU-Wan2.1-1.3B")
         result = client.predict(
             prompt=prompt,
-            negative_prompt="blurry, bad quality, distorted",
             api_name="/generate_video",
         )
         st.success("Video ready hai!")
@@ -29,4 +29,3 @@ if st.button("Generate Video"):
         st.error(f"Error aaya: {e}")
   else:
     st.warning("Pehle prompt to likhein!")
-    
