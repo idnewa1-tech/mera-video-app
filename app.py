@@ -1,5 +1,4 @@
 import os
-import requests
 import streamlit as st
 from gradio_client import Client
 
@@ -8,58 +7,43 @@ st.set_page_config(
 )
 
 st.title("🎬 Mera AI Video Generator")
-st.write("Prompt likhein aur direct MP4 video generate karein:")
+st.write("Prompt likhein aur asli AI MP4 Video banayein:")
 
-prompt = st.text_input("Prompt likhein:", value="a car driving fast on a highway")
+prompt = st.text_input(
+    "Prompt likhein:",
+    value="A red car speeding on a highway at night, cinematic",
+)
 
-# Hugging Face Verified Read Token
 HF_TOKEN = "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"
-
-
-def generate_video(prompt_text):
-  # 1. Try Primary Hugging Face Text-to-Video engine
-  try:
-    client = Client("hysts/zeroscope-v2", hf_token=HF_TOKEN)
-    result = client.predict(
-        prompt_text,
-        "",  # negative prompt
-        api_name="/predict",
-    )
-    if result and os.path.exists(str(result)):
-      return str(result)
-  except Exception:
-    pass
-
-  # 2. Try Secondary Public Video Space (No Auth Required)
-  try:
-    client2 = Client("damo-vilab/modelscope-damo-text-to-video-synthesis")
-    result2 = client2.predict(prompt_text, fn_index=0)
-    if result2 and os.path.exists(str(result2)):
-      return str(result2)
-  except Exception:
-    pass
-
-  return None
-
 
 if st.button("Generate Video", type="primary"):
   if not prompt.strip():
-    st.warning("Kripya pehle prompt likhein!")
+    st.warning("Pehle prompt likhein!")
   else:
     with st.spinner(
-        "AI Real Video render kar raha hai... Kripya 1 se 2 minute intezar"
-        " karein..."
+        "AI Video render ho raha hai... (ZeroGPU queue me 1 se 2 minute lagte"
+        " hain)..."
     ):
-      video_file = generate_video(prompt.strip())
+      try:
+        # Verified Space Client
+        client = Client("KingNish/Instant-Video", hf_token=HF_TOKEN)
 
-      if video_file:
-        st.success("Video successfully generate ho gaya!")
-        # Validated MP4 video display
-        with open(video_file, "rb") as f:
-          video_bytes = f.read()
-        st.video(video_bytes)
-      else:
-        st.error(
-            "Video generation servers par load jyada hai. Kripya 1 minute baad"
-            " dobara button dabayein."
+        # Exact 4 backend parameters required by this Space
+        result = client.predict(
+            prompt.strip(),  # 1. Prompt text
+            "ToonYou",  # 2. Base model
+            "Zoom in",  # 3. Motion effect
+            "4-Step",  # 4. Step quality
+            api_name="/instant_video",  # Exact registered API endpoint
         )
+
+        # Output validation
+        if result and os.path.exists(str(result)):
+          st.success("Video ready ho gaya!")
+          st.video(str(result))
+        else:
+          st.error("Server se video file prapt nahi hui.")
+
+      except Exception as e:
+        st.error(f"Error detail: {e}")
+          
